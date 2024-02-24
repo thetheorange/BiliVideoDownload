@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/venv" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="TemplatesService">
+    <option name="templateFileTypes">
+      <list>
+        <option value="HTML" />
+        <option value="Markdown" />
+        <option value="Qt UI file" />
+        <option value="XHTML" />
+        <option value="XML" />
+        <option value="CSS" />
+      </list>
+    </option>
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/template" />
+        <option value="$MODULE_DIR$/template/css" />
+        <option value="$MODULE_DIR$/template/images" />
+        <option value="$MODULE_DIR$/template/ui" />
+      </list>
+    </option>
+  </component>
+</module>
