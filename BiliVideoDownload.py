@@ -8,10 +8,11 @@ import os
 import sys
 import threading
 
+from PyQt5.QtCore import QLockFile
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox
 
-from core.config import modify_config, read_config
+from core.config import modify_config, read_config, init_config
 from core.global_signal import global_signal
 from core.videoSocket import videoSocket
 from logger.Logger import app_logger
@@ -158,6 +159,8 @@ class App(QWidget):
         try:
             self.setting_w.close()
             self.tray.quit()
+            modify_config(key="app_lock",
+                          value=0)
             raise KeyboardInterrupt
         except Exception as e:
             app_logger.error(f"[exit] exit error {e}")
@@ -177,21 +180,11 @@ class App(QWidget):
 if __name__ == "__main__":
     # 设置实例锁，防止程序多开
     def app_lock(func):
-        # 计数器，记录程序运行次数
-        ctn = 0
-
         def lock():
-            nonlocal ctn
-            ctn = 1
-            pid = os.getpid()
-            if ctn == 1:
-                func()
-            else:
-                cmd = f"taskkill /pid {pid} /f"
-                os.system(cmd)
-                app_logger.info("[exit] extra process exit!")
+            modify_config(key="app_lock",
+                          value=1)
+            func()
         return lock
-
 
     # 程序入口函数
     @app_lock
@@ -200,9 +193,9 @@ if __name__ == "__main__":
         window = App(sys_arg=sys.argv)
         window.setting_w.show()
         app.exec()
-
-
     try:
         main()
     except Exception as e:
         app_logger.error(f"[exit] exit error {e}")
+        modify_config(key="app_lock",
+                      value=0)
