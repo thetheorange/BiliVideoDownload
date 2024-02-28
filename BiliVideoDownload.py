@@ -4,9 +4,9 @@ Des 程序主文件，联系前端ui和后端爬虫数据，如程序无法运�
 Time 2024/2/21
 """
 import json
+import os
 import sys
 import threading
-
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox
@@ -52,10 +52,6 @@ class App(QWidget):
         # 获取项目对象
         self.__app = QApplication(sys_arg)
         self.__app.setQuitOnLastWindowClosed(False)
-
-        # 设置实例锁
-        modify_config(key="app_lock",
-                      value=1)
 
         # 加载登录和设置窗口
         self.login_w = loginWindow()
@@ -160,9 +156,6 @@ class App(QWidget):
     # 退出程序
     def __exit_app(self):
         try:
-            # 解除实例锁
-            modify_config(key="app_lock",
-                          value=0)
             self.setting_w.close()
             self.tray.quit()
             raise KeyboardInterrupt
@@ -182,14 +175,34 @@ class App(QWidget):
 
 # 测试代码
 if __name__ == "__main__":
+    # 设置实例锁，防止程序多开
+    def app_lock(func):
+        # 计数器，记录程序运行次数
+        ctn = 0
+
+        def lock():
+            nonlocal ctn
+            ctn = 1
+            pid = os.getpid()
+            if ctn == 1:
+                func()
+            else:
+                cmd = f"taskkill /pid {pid} /f"
+                os.system(cmd)
+                app_logger.info("[exit] extra process exit!")
+        return lock
+
+
+    # 程序入口函数
+    @app_lock
+    def main():
+        app = QApplication(sys.argv)
+        window = App(sys_arg=sys.argv)
+        window.setting_w.show()
+        app.exec()
+
+
     try:
-        if read_config().get("app_lock") == 0:
-            app = QApplication(sys.argv)
-            window = App(sys_arg=sys.argv)
-            window.setting_w.show()
-            app.exec()
+        main()
     except Exception as e:
         app_logger.error(f"[exit] exit error {e}")
-        # 解除实例锁
-        modify_config(key="app_lock",
-                      value=0)
