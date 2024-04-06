@@ -182,8 +182,9 @@ if __name__ == "__main__":
     def app_lock(func):
         def lock():
             modify_config(key="app_lock",
-                          value=1)
-            func()
+                          value=0)
+            if not read_config().get("app_lock"):
+                func()
         return lock
 
     # 程序入口函数
